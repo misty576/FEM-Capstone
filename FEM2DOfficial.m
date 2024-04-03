@@ -18,9 +18,10 @@
 %  e(1,1), e(1,2), ... , e(1, nbc) <-- index of the beginning node of a boundary edge
 %  e(2,1), e(2,2), ... , e(2, nbc) <-- index of the end node of a boundary edge
 %
-%  
+% 
 %  REFERENCE:  Numerical Solution of Differential Equations -- Introduction to 
 %              Finite Difference and Finite Element Methods, Cambridge University Press, 2017
+%
 
 close all
 clear all
@@ -290,4 +291,54 @@ end
     totalerr = abs(norm(err,Inf));
 
 end
+
+%%%%%%%%%%%%%     Exact Solution for u, values for f     %%%%%%%%%%%%%%%%
+
+function yp = uexact(x,y)
+ 
+    % 1.
+    %yp = (1-x*x - y*y)/(4);
+
+    % 2. 
+    %yp = -cos(pi*x);
+
+    % 3. 
+    %yp = -sin(pi*x)*cos(2*pi*y);
+
+    % 4.
+    %yp = x*x + y*y;
+
+    % 5.
+    yp = sin(pi*x)*sin(pi*y);
+
+    % 6. 
+    %yp = 1/4*(x^2+y^4)*sin(pi*x)*cos(4*pi*y);
+return
+
+end
+
+
+function f = f(x,y)
+    
+    % 1.
+    %f = 1;	
+    
+    % 2. 
+    %f = -pi*pi*cos(pi*x);
+    
+    % 3.
+    %f = -5*pi^2*cos(2*pi*y)*sin(pi*x);
+    
+    % 4. 
+    %f = -4;
+    
+    % 5.
+    f = 2*pi^2*sin(pi*x)*sin(pi*y);
+    
+    % 6.
+    %f = 17*pi^2*cos(4*pi*y)*sin(pi*x)*(x^2/4 + y^4/4) - 3*y^2*cos(4*pi*y)*sin(pi*x) - (cos(4*pi*y)*sin(pi*x))/2 - x*pi*cos(pi*x)*cos(4*pi*y) + 8*y^3*pi*sin(pi*x)*sin(4*pi*y);
+    
+    return
+end
+
 

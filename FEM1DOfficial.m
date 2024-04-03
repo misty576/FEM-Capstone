@@ -266,6 +266,7 @@ function [L2err, H1err] = error(uexact, uderivative, x, xi, w, nodes, u, element
     H1err = sqrt(H1err);
 end
 
+%%%%%%%%%%%%%     Exact Solution for u, values for f     %%%%%%%%%%%%%%%%
 
 function y = u_exact(x)
     

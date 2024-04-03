@@ -19,6 +19,8 @@
 %  e(2,1), e(2,2), ... , e(2, nbc) <-- index of the end node of a boundary edge
 %
 %  
+%  REFERENCE:  Numerical Solution of Differential Equations -- Introduction to 
+%              Finite Difference and Finite Element Methods, Cambridge University Press, 2017
 
 close all
 clear all

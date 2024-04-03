@@ -24,6 +24,9 @@
 %
 %  u - Our finite element solution
 %
+%
+%  REFERENCE:  Numerical Solution of Differential Equations -- Introduction to 
+%              Finite Difference and Finite Element Methods, Cambridge University Press, 2017
 
 
 

@@ -66,6 +66,7 @@ ylabel('Error')  % y-axis label
 title('Error Analysis for L2 and H1 norm')
 lgd.FontSize = 10;
 
+
 function [L2err, H1err, A_global] = main(node_no)
 
     % Define bounds of the domain
@@ -79,12 +80,12 @@ function [L2err, H1err, A_global] = main(node_no)
     x = zeros(node_no,1);
     [xi, w] = quadrature();
     
-    % setup x vector for coordinates of nodes on the domain
+    % Setup x vector for coordinates of nodes on the domain
     for i = 1:node_no
         x(i) = x1 + (i-1)*h;
     end
     
-    % setup matrix for storing the node pairs for each element
+    % Setup matrix for storing the node pairs for each element
     nodes = zeros(2, element_no);
     for i = 1:element_no
         for j = 1:2
@@ -96,7 +97,7 @@ function [L2err, H1err, A_global] = main(node_no)
     A_global = zeros(node_no, node_no);
     B_global = zeros(node_no, 1);
     
-    % Assemble matrices
+    % Assemble stiffness matrix and load vector
     [A_global, B_global] = form_matrices(nodes, x, element_no, xi, w, A_global, B_global, node_no);
     
     % Solve for u
@@ -114,10 +115,6 @@ function [L2err, H1err, A_global] = main(node_no)
     %%%%%%%%%%%%%%%%%%%%%%%      Calculate Errors     %%%%%%%%%%%%%%%%%%%%%%%%%
     
     [L2err, H1err] = error(uexact, uderivative, x, xi, w, nodes, u, element_no);
-
-    
-    %%%%%%%%%%%%%%%%%%%%%%%      Post-Processing      %%%%%%%%%%%%%%%%%%%%%%%%%
-    
     
     x3 = linspace(x1, x2, 1000);
     u_analytical = u_exact(x3);
@@ -133,8 +130,14 @@ function [L2err, H1err, A_global] = main(node_no)
     title(sprintf('Finite Element Solution vs Exact Solution for numElem = %d', node_no-1));
     legend('Finite Element Solution', 'Exact Solution');
     hold off;
-
-    return
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%      Post-Processing      %%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    x3 = linspace(x1, x2, 1000);
+    for i = 1:length(x3)
+        u_analytical(i) = uexact(x3(i));
+    end
 
 end
 
@@ -162,47 +165,12 @@ function [A_global, B_global] = form_matrices(nodes, x, element_no, ...
         i1 = nodes(1, nel);
         i2 = nodes(2, nel);
 
-
-%%%%%%%%%%%%%%%%%%%%      Calculate Local Matrices      %%%%%%%%%%%%%%%%%%%
-
-
-        dx = (x2-x1)/2;
-        xk = 1;
-        
-    
-        A_local = zeros(2,2);
-        B_local = zeros(2,1);
-    
-        for l=1:length(w)
-            x = x1 + (x2-x1)/2 * (1+xi(l));
-            xf = 12*x^2-36*x+18;
-            
-            [N,dN] = basis(xi(l));
-            for i =1:2 
-                B_local(i) = B_local(i) + N(i)*xf*w(l)*dx;
-                for j =1:2 
-                    A_local(i,j) = A_local(i,j) + (xk*dN(i)*dN(j)/(dx*dx))*w(l)*dx;
-                end
-            end
-        end
-            
-%%%%%%%%%%%%%%%%%%%%%%     Assemble Global Matrices   %%%%%%%%%%%%%%%%%%%%%
-
-         for i = 1:2
-            iglobal = nodes(i, nel);
-            B_global(iglobal) = B_global(iglobal) + B_local(i);
-            for j = 1:2
-                jglobal = nodes(j, nel);
-                A_global(iglobal, jglobal) = A_global(iglobal, jglobal) + A_local(i,j);
-            end
-        end
+        [A_local, B_local] = local_mat(x(i1), x(i2), xi, w);
+        [A_global, B_global] = global_mat(A_local, B_local, nel, nodes, A_global, B_global);
     end
     
-
     
-%%%%%%%%%%%%%%%    Apply Dirichlet Boundary Conditions    %%%%%%%%%%%%%%%%%
- 
-
+    % Apply Dirichlet boundary conditions
     A_global(1, :) = 0;  % Zero out the first row
     A_global(:, 1) = 0;  % Zero out the first column
     A_global(1, 1) = 1;  % Set diagonal element to 1
@@ -214,13 +182,49 @@ function [A_global, B_global] = form_matrices(nodes, x, element_no, ...
     B_global(node_no) = 0;  % Set the value at the last node
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%      u_exact      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function y = u_exact(x)
-    
-    y = -(x-3).^2.*x.^2;
 
+%%%%%%%%%%%%%%%%%%%%      Calculate Local Matrices      %%%%%%%%%%%%%%%%%%%
+
+
+function [A_local, B_local] = local_mat(x1, x2, xi, w)
+    dx = (x2-x1)/2;
+    xk = 1;
+
+
+    A_local = zeros(2,2);
+    B_local = zeros(2,1);
+
+    for l=1:2
+        x = x1 + (x2-x1)/2 * (1+xi(l));
+        xf = f(x);
+        [N,dN] = basis(xi(l));
+        for i =1:2 
+            B_local(i) = B_local(i) + N(i)*xf*w(l)*dx;
+            for j =1:2 
+                A_local(i,j) = A_local(i,j) + (xk*dN(i)*dN(j)/(dx*dx))*w(l)*dx;
+            end
+        end
+    end
 end
+
+
+%%%%%%%%%%%%%%%%%%%%%%     Assemble Global Matrices   %%%%%%%%%%%%%%%%%%%%%
+
+
+function [A_global, B_global] = global_mat(A_local, B_local, nel, nodes, A_global, B_global)
+    for i = 1:2
+        iglobal = nodes(i, nel);
+        B_global(iglobal) = B_global(iglobal) + B_local(i);
+        for j = 1:2
+            jglobal = nodes(j, nel);
+            A_global(iglobal, jglobal) = A_global(iglobal, jglobal) + A_local(i,j);
+        end
+    end
+end
+
+
+
 
 
 %%%%%%%%%%%%%%%%%%       Calculate the Error Norms       %%%%%%%%%%%%%%%%%%
@@ -257,8 +261,18 @@ function [L2err, H1err] = error(uexact, uderivative, x, xi, w, nodes, u, element
         H1err = H1err + errh1*h;
     end
 
-    % Take square root to obtain L2 error norm
+    % Take square root to obtain L2, H1 error norm
     L2err = sqrt(L2err);
     H1err = sqrt(H1err);
 end
 
+
+function y = u_exact(x)
+    
+    y = -(x-3).^2.*x.^2;
+
+end
+
+function y = f(x)
+    y = 12*x^2-36*x+18;
+end

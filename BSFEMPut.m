@@ -25,6 +25,9 @@
 %
 %  xi - matrix for the time variables (calculated using Crank-Nicolson)
 %
+%  REFERENCE: The Finite Element Method for Option Pricing under Heston’s Model.
+%             Final Report for MA6621 Programming and Computing for Finance and Actuarial Science.
+%             Hu Wei, Yao Wuguannan and Huang Jiaheng, Univeristy of Hong Kong, 2016
 
 close all
 clear all

@@ -25,10 +25,7 @@
 %
 %  xi - matrix for the time variables (calculated using Crank-Nicolson)
 %
-%  REFERENCE: The Finite Element Method for Option Pricing under Heston’s Model.
-%             Final Report for MA6621 Programming and Computing for Finance and Actuarial Science.
-%             Hu Wei, Yao Wuguannan and Huang Jiaheng, Univeristy of Hong Kong, 2016
-%
+
 close all
 clear all
 
@@ -148,7 +145,7 @@ end
 V = nodes;
 stock = S;
 time = T-tau*2/sigma^2;
-s = mesh(time',stock(N/8:N/2),V(N/8:N/2,:));view(3);
+s = mesh(time',stock(round(N/8):round(N/2)),V(round(N/8):round(N/2),:));view(3);
 s.FaceColor = 'interp';
 s.FaceAlpha = 0.3;
 s.EdgeAlpha = 1; 
@@ -162,10 +159,10 @@ ylabel('Stock Price (S)');xlabel('Time (T-t)');zlabel('Option Price V(S,t)');
 
 % Output a 2D plot of the FEM Approximation for different time values
 figure(2);
-plot(stock(N/8:N/2), V(N/8:N/2, 1), 'r-', 'LineWidth', 1);
+plot(stock(round(N/8):round(N/2)), V(round(N/8):round(N/2), 1), 'r-', 'LineWidth', 1);
 hold on;
-plot(stock(N/8:N/2), V(N/8:N/2, M/2), '-', 'LineWidth', 1, 'Color',[0.1,0.6,0]);
-plot(stock(N/8:N/2), V(N/8:N/2,M), 'b-', 'LineWidth', 1);
+plot(stock(round(N/8):round(N/2)), V(round(N/8):round(N/2), M/2), '-', 'LineWidth', 1, 'Color',[0.1,0.6,0]);
+plot(stock(round(N/8):round(N/2)), V(round(N/8):round(N/2),M), 'b-', 'LineWidth', 1);
 legend("V(S,T) at maturity", "V(S,T/2)", "V(S,0) initial condition");
 xlabel('Stock Price (S)');
 ylabel('Option Value V(S,t)');
@@ -186,12 +183,12 @@ end
 
 
 V_exact = flip(V_exact,2);
-V_exact = V_exact(1:3*N/4, :);
+V_exact = V_exact(1:round(3*N/4), :);
 V = V(1:3*N/4,:);
-err = V - V_exact;
+err = V_exact - V;
 figure(3);
-mesh(time, stock(1:3*N/4), err);
-colormap hsv
+mesh(time, stock(1:round(3*N/4)), err);
+colormap winter
 title('Error of Finite Element Solution');
 ylabel('Stock Price');xlabel('Time');zlabel('Error');
 

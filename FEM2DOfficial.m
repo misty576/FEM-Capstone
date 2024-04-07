@@ -2,7 +2,7 @@
 %                  2D Finite Element Method Solver 
 %  This code solves the model problem -\nabla u = f for a sqaure (or rectangular)
 %  domain \Omega = [xmin,xmax] x [ymin,ymax] (Can be modified to your liking).
-%  
+%
 %  xmin, xmax, ymin, ymax - the bounds of our domain
 %  Nx, Ny - Number of elements in the x,y direction resp.
 %
@@ -36,7 +36,10 @@ fprintf('numElem (on each axis)\t\tInfNormError\t\tRate of Convergence\n');
 i = 1;
 for numElem = [4,8,16,32,64]
 
-    [ufem, u_exact, totalerr, p, e, t, err] = main(numElem,numElem);
+    % State the type of domain here. ('square' or 'circle')
+    type = "square";
+
+    [ufem, u_exact, totalerr, p, e, t, err] = main(numElem,numElem, type);
     h(i) = 1/numElem;
     % Store errors and corresponding step sizes
     errors = [errors, totalerr];
@@ -50,7 +53,12 @@ for numElem = [4,8,16,32,64]
     figure;
     subplot(1, 2, 1);
     pdemesh(p,e,t, 'XYData', ufem, 'ZData', ufem, 'Mesh','on','ColorMap','jet');
-    title(['FEM Solution for h_{max} = ', num2str(numElem)]);
+    
+    if type == "square"
+        title(['FEM Solution for h = ', num2str(1/numElem)]);
+    elseif type == "circle"
+        title(['FEM Solution for h = ', num2str(2/numElem)]);
+    end
     subplot(1, 2, 2);
     pdemesh(p,e,t,'XYData', err, 'ZData', err, 'Mesh','on','ColorMap','jet');
     title('FEM error u_{exact} - u_{fem}');
@@ -70,7 +78,7 @@ lgd.FontSize = 10;
 
 
 
-function [ufem, u_exact, totalerr, p, e, t, err] = main(Nx,Ny)
+function [ufem, u_exact, totalerr, p, e, t, err] = main(Nx,Ny, type)
 
 
 %%%%%%%%%%%%%%%%%%      Set up Uniform Triangulation      %%%%%%%%%%%%%%%%
@@ -141,8 +149,10 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%     Assembling and Solving     %%%%%%%%%%%%%%%%%%%%%%  
 
-%%%%%%%    NB: Comment out this line to change to a circle domain
-%[p, e, t] = initmesh("circleg",'hmax',1/(Nx/2));
+
+if type == "circle"
+    [p, e, t] = initmesh("circleg",'hmax',1/(Nx/2));
+end
 
 % Extract the number of elements and nodes
 [~, nelem] = size(t);
@@ -303,13 +313,13 @@ function yp = uexact(x,y)
     %yp = -cos(pi*x);
 
     % 3. 
-    %yp = -sin(pi*x)*cos(2*pi*y);
+    % yp = -sin(pi*x)*cos(2*pi*y);
 
     % 4.
     %yp = x*x + y*y;
 
     % 5.
-    yp = sin(pi*x)*sin(pi*y);
+     yp = sin(pi*x)*sin(pi*y);
 
     % 6. 
     %yp = 1/4*(x^2+y^4)*sin(pi*x)*cos(4*pi*y);
@@ -333,12 +343,11 @@ function f = f(x,y)
     %f = -4;
     
     % 5.
-    f = 2*pi^2*sin(pi*x)*sin(pi*y);
+     f = 2*pi^2*sin(pi*x)*sin(pi*y);
     
     % 6.
     %f = 17*pi^2*cos(4*pi*y)*sin(pi*x)*(x^2/4 + y^4/4) - 3*y^2*cos(4*pi*y)*sin(pi*x) - (cos(4*pi*y)*sin(pi*x))/2 - x*pi*cos(pi*x)*cos(4*pi*y) + 8*y^3*pi*sin(pi*x)*sin(4*pi*y);
     
     return
 end
-
 

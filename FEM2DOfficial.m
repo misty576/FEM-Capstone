@@ -31,24 +31,42 @@ clear all
 errors = [];
 meshSizes = [];
 
-fprintf('numElem (on each axis)\t\tInfNormError\t\tRate of Convergence\n');
+%%%%  State the type of domain here. ('square' or 'circle')  %%%%%%%%
+type = "square";
+
+if type == "square"
+    fprintf('numElem (on each axis)\t\tInfNormError\t\tRate of Convergence\n');
+elseif type == "circle"
+    fprintf('h\t\t\t\t\tInfNormError\t\tRate of Convergence\n');
+end
 
 i = 1;
 for numElem = [4,8,16,32,64]
 
-    % State the type of domain here. ('square' or 'circle')
-    type = "square";
-
     [ufem, u_exact, totalerr, p, e, t, err] = main(numElem,numElem, type);
-    h(i) = 1/numElem;
+    if type == "square"
+        h(i) = 1/numElem;
+    elseif type == "circle"
+        h(i) = 2/numElem;
+    end
+    
     % Store errors and corresponding step sizes
     errors = [errors, totalerr];
     meshSizes = [meshSizes, numElem]; % Update here
     if i == 1
-        fprintf('%d\t\t\t\t\t\t\t%.6e\t\n', numElem, totalerr);
+        if type == "square"
+            fprintf('%d\t\t\t\t\t\t\t%.6e\t\n', numElem, totalerr);
+        elseif type == "circle"
+             fprintf('%f\t\t\t%.6e\t\n', 2/numElem, totalerr);
+        end
+
     else
         rate = log2(errors(i)/errors(i-1));
-        fprintf('%d\t\t\t\t\t\t\t%.6e\t\t%d\t\n', numElem, totalerr, abs(rate));
+        if type == "square"
+            fprintf('%d\t\t\t\t\t\t\t%.6e\t\t%d\t\n', numElem, totalerr, abs(rate));
+        elseif type == "circle"
+            fprintf('%f\t\t\t%.6e\t\t%d\t\n', 2/numElem, totalerr, abs(rate));
+        end
     end
     figure;
     subplot(1, 2, 1);
@@ -319,7 +337,7 @@ function yp = uexact(x,y)
     %yp = x*x + y*y;
 
     % 5.
-     yp = sin(pi*x)*sin(pi*y);
+    yp = sin(pi*x)*sin(pi*y);
 
     % 6. 
     %yp = 1/4*(x^2+y^4)*sin(pi*x)*cos(4*pi*y);
@@ -337,7 +355,7 @@ function f = f(x,y)
     %f = -pi*pi*cos(pi*x);
     
     % 3.
-    %f = -5*pi^2*cos(2*pi*y)*sin(pi*x);
+    % f = -5*pi^2*cos(2*pi*y)*sin(pi*x);
     
     % 4. 
     %f = -4;

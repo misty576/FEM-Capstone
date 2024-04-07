@@ -5,8 +5,8 @@
 %   
 %  This program solves the method for different values of h (step size) and
 %  provides error analysis by producing the error for the infinity norm, 
-%  L2 norm and H1 norm.
-% 
+%  L2 norm and H1 norm. 
+%
 %  x1, x2 - interval bounds
 %  
 %  node_no - number of nodes

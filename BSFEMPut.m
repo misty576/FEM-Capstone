@@ -25,9 +25,6 @@
 %
 %  xi - matrix for the time variables (calculated using Crank-Nicolson)
 %
-%  REFERENCE: The Finite Element Method for Option Pricing under Heston’s Model.
-%             Final Report for MA6621 Programming and Computing for Finance and Actuarial Science.
-%             Hu Wei, Yao Wuguannan and Huang Jiaheng, Univeristy of Hong Kong, 2016
 
 close all
 clear all
@@ -145,7 +142,7 @@ end
 V = nodes;
 stock = S;
 time = T-tau*2/sigma^2;
-s = mesh(time',stock(3*N/10:85*N/100),V(3*N/10:85*N/100,:));view(3);
+s = mesh(time',stock(round(3*N/10):round(85*N/100)),V(round(3*N/10):round(85*N/100),:));view(3);
 %mesh(time', stock, Nodes_v);view(3);
 s.FaceColor = 'interp';
 s.FaceAlpha = 0.3;
@@ -158,10 +155,10 @@ ylabel('Stock Price (S)');xlabel('Time (T-t)');zlabel('Option Price V(S,t)');
 
 % Output a 2D plot of the FEM Approximation for different time values
 figure(2);
-plot(stock(3*N/10:85*N/100), V(3*N/10:85*N/100, 1), 'r-', 'LineWidth', 1);
+plot(stock(round(3*N/10):round(85*N/100)), V(round(3*N/10):round(85*N/100), 1), 'r-', 'LineWidth', 1);
 hold on;
-plot(stock(3*N/10:85*N/100), V(3*N/10:85*N/100, M/2), '-', 'LineWidth', 1, 'Color',[0.1,0.6,0]);
-plot(stock(3*N/10:85*N/100), V(3*N/10:85*N/100,M), 'b-', 'LineWidth', 1);
+plot(stock(round(3*N/10):round(85*N/100)), V(round(3*N/10):round(85*N/100), M/2), '-', 'LineWidth', 1, 'Color',[0.1,0.6,0]);
+plot(stock(round(3*N/10):round(85*N/100)), V(round(3*N/10):round(85*N/100),M), 'b-', 'LineWidth', 1);
 legend("V(S,T) at maturity", "V(S,T/2)", "V(S,0) initial condition");
 xlabel('Stock Price (S)');
 ylabel('Option Value V(S,t)');
@@ -182,12 +179,12 @@ end
 
 
 V_exact = flip(V_exact,2);
-V_exact = V_exact(3*N/10:85*N/100, :);
-V = V(3*N/10:85*N/100,:);
-err = V - V_exact;
+V_exact = V_exact(round(3*N/10):round(85*N/100), :);
+V = V(round(3*N/10):round(85*N/100),:);
+err = V_exact - V;
 figure(3);
-mesh(time, stock(3*N/10:85*N/100), err);
-colormap jet
+mesh(time, stock(round(3*N/10):round(85*N/100)), err);
+colormap parula
 title('Error of Finite Element Solution');
 ylabel('Stock Price');xlabel('Time');zlabel('Error');
 

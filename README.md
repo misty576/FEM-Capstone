@@ -22,3 +22,9 @@ DESCRIPTION OF FILES
 4. BSFEMPut.m 
 - This MATLAB program solves the Black-Scholes Equation (transformed to a heat equation) for the European Put option problem with given parameters.
 - Performs error analysis by calculating and plotting the error of the FEM approximation
+
+5. Finite Element Methods with Applications in Mathematical Finance Final Version.pdf
+- Thesis pdf of the research I carried out for the project
+
+6. Project Poster.pdf
+- Poster used to give an overview of the project
